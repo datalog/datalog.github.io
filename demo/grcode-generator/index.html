@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8"/>
+	<meta name="viewport" content="width=device-width,initial-scale=1"/>
+	<title>QR Code playground</title>
+	<link rel="icon" href="favicon.png" type="image/png"/>
+	<style>
+		* {margin:0; padding:0; box-sizing:border-box;}
+		:root {color-scheme:light; --ink:#202127; --muted:#777983; --line:#e7e7eb; --accent:#4855ca;}
+		html,body {height:100%;}
+		body {font:13px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif; color:var(--ink); background:#fff;}
+		button,input,select,textarea {font:inherit; color:inherit;}
+		button,select,input[type='checkbox'],input[type='color'] {cursor:pointer;}
+		:focus-visible {outline:2px solid var(--accent); outline-offset:3px;}
+		button {background:#fff; border:1px solid var(--line); border-radius:5px; padding:8px 12px; font-weight:500;}
+		button:hover {background:#f3f3f8;}
+		button:disabled {opacity:.4; cursor:default;}
+		a {color:var(--accent); text-underline-offset:3px;}
+		[hidden] {display:none !important;}
+		main {height:100dvh; display:grid; grid-template-rows:minmax(0,1fr) 180px; overflow:hidden;}
+		.stage {display:contents;}
+		#back-to-qr {display:none;}
+		#box {display:flex; align-items:center; justify-content:center; min-height:0; padding:24px; overflow:hidden; background:url('data:image/gif;base64,R0lGODlhBgAGAIAAAO7u7t7e3iH5BAAAAAAALAAAAAAGAAYAAAIKhIOXgKGuDIOzAAA7') #eeeff1;}
+		#box svg {display:block; max-width:100%; max-height:100%; flex-shrink:1;}
+		.message {grid-row:2; min-height:0; display:flex; flex-direction:column; background:#fff; border-top:1px solid var(--line);}
+		.message-head {display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px 12px; padding:10px 20px 4px;}
+		.message-head label {font-size:11px; font-weight:600; color:var(--muted);}
+		.samples {display:flex; flex-wrap:wrap; gap:4px; align-items:center;}
+		.samples button {font-size:11px; padding:4px 9px; background:#f5f5fa; border-color:transparent;}
+		textarea {display:block; flex:1; min-height:0; width:100%; border:0; background:transparent; resize:none; padding:6px 24px; text-align:center; font-size:22px; line-height:1.5;}
+		.input-foot {display:flex; justify-content:space-between; gap:12px; padding:6px 20px 10px; font-size:10px; color:var(--muted);}
+		#error {padding:4px 20px; color:#a23131; font-size:11px; text-align:center;}
+		.inspector {position:fixed; z-index:5; top:24px; right:24px; width:400px; max-width:calc(100vw - 32px); height:min(690px,calc(100dvh - 220px)); min-height:250px; display:flex; flex-direction:column; background:#fff; border:1px solid #dcdce4; border-radius:9px; box-shadow:0 10px 40px #20212724; overflow:hidden;}
+		.inspector-head {display:flex; justify-content:space-between; align-items:center; gap:12px; padding:18px 18px 24px; cursor:move; touch-action:none; flex:none;}
+		h1 {font-size:17px; font-weight:650; letter-spacing:-.5px;}
+		.grip {color:#aaaab5; font-size:18px; letter-spacing:2px; user-select:none;}
+		.actions {display:flex; gap:8px; padding:0 18px 10px; flex:none;}
+		.actions button {flex:1; font-size:12px;}
+		.primary {background:var(--accent); border-color:var(--accent); color:#fff;}
+		.primary:hover {background:#3945b3;}
+		#status {padding:0 18px 10px; font-size:10px; line-height:1.4; color:var(--muted); min-height:24px; flex:none;}
+		.tabs {display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); background:#fafafd; padding:0 6px; flex:none;}
+		.tabs button {display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; min-height:68px; border:0; border-bottom:2px solid transparent; border-radius:0; padding:9px 3px; background:transparent; color:var(--muted); font-size:10px;}
+		.tabs svg {width:20px; height:20px;}
+		.tabs [aria-selected='true'] {color:var(--accent); border-bottom-color:var(--accent); background:#f1f2fc;}
+		.tab-body {min-height:0; flex:1; overflow-y:auto; overscroll-behavior:contain; scrollbar-gutter:stable; overflow-anchor:none;}
+		.tab-panel {padding:18px;}
+		.tab-panel:focus-visible {outline-offset:-3px;}
+		h2 {font-size:13px; font-weight:600; margin-bottom:14px;}
+		h3 {font-size:10px; letter-spacing:1.3px; text-transform:uppercase; color:var(--muted); margin-bottom:14px;}
+		.settings section + section {border-top:1px solid var(--line); margin-top:18px; padding-top:18px;}
+		.section-head {display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;}
+		.section-head h2 {margin:0;}
+		.small {font-size:11px; padding:4px 9px;}
+		.field {display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:13px;}
+		.field:first-of-type {margin-top:0;}
+		select,input[type='number'] {appearance:none; width:120px; padding:7px 2px; background:transparent; border:0; border-bottom:1px solid #cbcdd7; border-radius:0;}
+		select {padding-right:18px; background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='m2 2 4 4 4-4' fill='none' stroke='%23777983'/%3E%3C/svg%3E") no-repeat right center;}
+		input[type='number'] {width:85px; text-align:right;}
+		input[type='checkbox'] {appearance:none; width:32px; height:19px; border-radius:12px; background:#d7d8df; position:relative; flex-shrink:0;}
+		input[type='checkbox']:before {content:''; position:absolute; width:13px; height:13px; top:3px; left:3px; border-radius:50%; background:#fff;}
+		input[type='checkbox']:checked {background:var(--accent);}
+		input[type='checkbox']:checked:before {transform:translateX(13px);}
+		input[type='color'] {border:0; padding:0; background:transparent; width:32px; height:26px;}
+		input[type='color']::-webkit-color-swatch-wrapper {padding:2px;}
+		input[type='color']::-webkit-color-swatch {border:1px solid #ddd; border-radius:5px;}
+		.note {font-size:11px; color:var(--muted); margin-top:12px;}
+		.stats {display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; margin-bottom:22px;}
+		.stats div {padding:12px; border:1px solid var(--line); border-radius:6px; background:#f8f8fc;}
+		.stats dt {font-size:10px; color:var(--muted); margin-bottom:5px;}
+		.stats dd {font:18px Consolas,monospace;}
+		#actual {display:block; color:var(--accent); font-size:11px; margin:-6px 0 18px;}
+		#metadata {display:grid; grid-template-columns:1fr 1fr; font-size:11px; gap:9px 14px;}
+		#metadata dt {color:var(--muted);}
+		#metadata dd {font-family:Consolas,monospace; overflow-wrap:anywhere;}
+		#decoded {padding-top:22px;}
+		#decoded table {border-collapse:collapse; width:100%; font-size:11px;}
+		#decoded th,#decoded td {padding:6px 3px; text-align:left; border-bottom:1px solid var(--line);}
+		#decoded .segment-text {white-space:pre-wrap; overflow-wrap:anywhere; color:var(--muted); padding-bottom:12px; font-family:Consolas,monospace;}
+		pre {font:12px/1.8 Consolas,monospace; white-space:pre-wrap; overflow-wrap:anywhere; padding:14px; background:#f8f8fc; border:1px solid var(--line); border-radius:5px;}
+		.fn {color:var(--accent); font-weight:bold;}
+		.key {color:#496c83;} .str {color:#8a5b2b;} .num {color:#795797;}
+		.links {display:flex; flex-direction:column; gap:9px; margin-top:22px; font-size:12px;}
+		@media(min-width:1280px) {
+			.inspector {height:min(860px,calc(100dvh - 220px));}
+			main {grid-template-rows:minmax(0,1fr); padding-bottom:204px; background:url('data:image/gif;base64,R0lGODlhBgAGAIAAAO7u7t7e3iH5BAAAAAAALAAAAAAGAAYAAAIKhIOXgKGuDIOzAAA7') #eeeff1;}
+			.message {position:fixed; z-index:4; left:50%; bottom:20px; transform:translateX(-50%); width:calc(100% - 48px); max-width:1120px; height:164px; border:1px solid #dcdce4; border-radius:9px; box-shadow:0 8px 32px #20212718; overflow:hidden;}
+		}
+		@media(min-width:801px) and (max-width:1279px) {
+			main {margin-right:360px;}
+			.inspector {top:0; right:0; width:360px; max-width:none; height:100dvh; min-height:0; border:0; border-left:1px solid var(--line); border-radius:0; box-shadow:none;}
+			.inspector-head {cursor:default; touch-action:auto;}
+			.grip {display:none;}
+		}
+		@media(max-width:800px) {
+			main {display:block; height:auto; min-height:100dvh; overflow:visible; isolation:isolate;}
+			.stage {display:flex; flex-direction:column; position:sticky; top:0; z-index:0;}
+			.stage:after {content:''; position:absolute; inset:0; z-index:2; background:#11131c; opacity:var(--stage-dim,0); pointer-events:none;}
+			.message {order:0; flex:none; height:150px; border-top:0; border-bottom:1px solid var(--line);}
+			.message-head {padding:9px 14px 3px;}
+			textarea {font-size:18px; padding:5px 16px;}
+			.input-foot {padding:4px 14px 9px; font-size:9px;}
+			.samples {gap:3px;}
+			#box {order:1; flex:none; height:clamp(220px,42svh,360px); padding:16px;}
+			.inspector {position:relative; top:auto; right:auto; left:auto; z-index:1; width:100%; max-width:none; height:auto; min-height:100svh; border:0; border-top:1px solid var(--line); border-radius:0; box-shadow:0 -8px 24px #20212712; overflow:visible; padding-bottom:70px;}
+			.inspector-head {cursor:default; touch-action:auto; padding:18px 16px 24px;}
+			.grip {display:none;}
+			.actions {padding:0 16px 10px;}
+			#status {padding-left:16px; padding-right:16px;}
+			.tab-body {overflow:visible; scrollbar-gutter:auto;}
+			.tab-panel {padding:18px 16px;}
+			body.typing .message {height:108px;}
+			body.typing .input-foot {display:none;}
+			body.typing #box {height:clamp(140px,calc(var(--visible-height,100dvh) - 118px),280px);}
+			#back-to-qr {display:block; position:fixed; z-index:20; right:14px; bottom:calc(14px + env(safe-area-inset-bottom)); padding:11px 16px; border-radius:24px; border-color:var(--accent); background:var(--accent); color:#fff; box-shadow:0 4px 18px #20212725;}
+		}
+	</style>
+	<script src="qrcode.min.js"></script>
+	<script src="qrcode-demo-decode.min.js"></script>
+</head>
+<body>
+<main>
+	<div class="stage">
+	<div id="box" role="img" aria-label="Generated QR Code"></div>
+	<section class="message" aria-labelledby="message-title">
+		<div class="message-head"><label id="message-title" for="msg">Your message</label><div id="samples" class="samples" role="group" aria-label="Example messages"><button type="button" data-sample="0">URL</button><button type="button" data-sample="1">Numeric</button><button type="button" data-sample="2">日本語</button><button type="button" data-sample="3">Mixed + emoji</button></div></div>
+		<textarea id="msg" spellcheck="false" aria-describedby="count error">https://github.com/datalog/qrcode-generator</textarea>
+		<p id="error" role="alert" hidden></p>
+		<div class="input-foot"><span id="count"></span><span>Text stays in your browser.</span></div>
+	</section>
+	</div>
+	<aside class="inspector" aria-labelledby="playground-title">
+		<div class="inspector-head"><h1 id="playground-title">QR Code playground</h1><span class="grip" aria-hidden="true">⠿</span></div>
+		<div class="actions"><button id="save" class="primary" type="button">Download SVG ↓</button><button id="copy-svg" type="button">Copy SVG</button></div>
+		<p id="status" role="status" aria-live="polite">Ready</p>
+		<div class="tabs" role="tablist" aria-label="Playground tools">
+			<button id="tab-settings" role="tab" aria-selected="true" aria-controls="pane-settings" tabindex="0" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="3"/><circle cx="15" cy="17" r="3"/></svg><span>Settings</span></button>
+			<button id="tab-inside" role="tab" aria-selected="false" aria-controls="pane-inside" tabindex="-1" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 3h6v6H3zM15 3h6v6h-6zM3 15h6v6H3zM15 15h2v2h-2zM19 19h2v2h-2zM19 13h2v2h-2zM13 19h2v2h-2z"/></svg><span>Inside this QR Code</span></button>
+			<button id="tab-code" role="tab" aria-selected="false" aria-controls="pane-code" tabindex="-1" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m8 6-6 6 6 6m8-12 6 6-6 6m-3-15-2 18"/></svg><span>Use it in your code</span></button>
+		</div>
+		<div class="tab-body">
+			<section id="pane-settings" class="tab-panel settings" role="tabpanel" aria-labelledby="tab-settings" tabindex="0"><div class="section-head"><h2>Settings</h2><button id="reset" class="small" type="button">Reset</button></div><section><h3>Encoding</h3>
+				<div class="field"><label for="ecl">Error correction</label><select id="ecl"><option value="L">L · Low</option><option value="M" selected>M · Medium</option><option value="Q">Q · Quartile</option><option value="H">H · High</option></select></div>
+				<div class="field"><label for="boost">Boost correction</label><input id="boost" type="checkbox" checked/></div>
+				<p class="note">Raises correction when it fits the same QR version.</p>
+				<div class="field"><label for="mask">Mask pattern</label><select id="mask"><option value="-1">Automatic</option><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option></select></div>
+			</section>
+			<section><h3>Appearance</h3>
+				<div class="field"><label for="dim">Size · px</label><input id="dim" type="number" value="256" min="64" max="61440" step="1" required/></div>
+				<div class="field"><label for="pad">Quiet zone · modules</label><input id="pad" type="number" value="4" min="0" max="10" step="1" required/></div>
+				<div class="field"><label for="fg">Foreground</label><input id="fg" type="color" value="#202127"/></div>
+				<div class="field"><label for="bg">Background</label><input id="bg" type="color" value="#ffffff"/></div>
+				<div class="field"><label for="opaque">Transparent background</label><input id="opaque" type="checkbox" checked/></div>
+				<p class="note" id="scan-note">Use a light background when placing a transparent QR Code.</p>
+			</section>
+			<section><div class="field"><label for="compact">Compact SVG path</label><input id="compact" type="checkbox" checked/></div><p class="note">Same QR Code, fewer path commands.</p></section></section>
+			<section id="pane-inside" class="tab-panel diagnostics" role="tabpanel" aria-labelledby="tab-inside" tabindex="0" hidden><dl class="stats"><div><dt>QR version</dt><dd id="version">—</dd></div><div><dt>Matrix</dt><dd id="matrix">—</dd></div><div><dt>SVG size</dt><dd id="size">—</dd></div><div><dt>Generation</dt><dd id="time">—</dd></div></dl><h2>Inside this QR Code</h2><span id="actual">—</span><dl id="metadata"></dl><div id="decoded"></div><p class="note">Read from the generated SVG modules. Format and version fields are checked against their BCH codes and duplicate copies. Payload segments are decoded and compared with your input. Reed–Solomon blocks are checked for errors; damage is not repaired.</p></section>
+			<section id="pane-code" class="tab-panel snippet" role="tabpanel" aria-labelledby="tab-code" tabindex="0" hidden><div class="section-head"><h2>Use it in your code</h2><button id="copy-code" class="small" type="button">Copy code</button></div><pre><code id="code"></code></pre><nav class="links" aria-label="Resources"><a href="README.md">Documentation ↗</a><a href="https://github.com/datalog/qrcode-generator">Source on GitHub ↗</a><a href="qrcode-kanji-optimized.html">Original demo ↗</a></nav></section>
+		</div>
+	</aside>
+</main>
+<button id="back-to-qr" type="button" hidden>↑ Text &amp; QR</button>
+<script>
+	'use strict';
+
+	(function() {
+
+		var
+		get = function( id ) { return document.getElementById( id ); },
+		box = get('box'), txt = get('msg'), code = get('code'), error = get('error'),
+		dim = get('dim'), pad = get('pad'), mask = get('mask'), ecl = get('ecl'),
+		boost = get('boost'), fg = get('fg'), bg = get('bg'), opaque = get('opaque'), compact = get('compact'),
+		save = get('save'), copySvg = get('copy-svg'), copyCode = get('copy-code'),
+		output = '', source = '', composing = false, timer = 0, revision = 0,
+		sampleIndex = [0,0,0,0],
+		samples = [
+			 [ 'https://github.com/datalog/qrcode-generator', 'https://example.org/hello?from=qr', 'https://en.wikipedia.org/wiki/QR_code' ]
+			,[ '01234567890123456789012345678901234567890123456789', '314159265358979323846264338327950288419716939937510', '202610251234567890' ]
+			,[ '日本語のQRコード。こんにちは世界！', '春はあけぼの。夏は夜。秋は夕暮れ。冬はつとめて。', '東京・京都・大阪。新しい旅を始めよう。' ]
+			,[ 'TOKYO 2026 / 東京 / Ticket 1234567890 / Hello 🌏', 'HELLO 世界 🌸 / ORDER 9876543210 / café', '京都 KYOTO 🚄 09:30 / Platform 12 / よい旅を！' ]
+		],
+
+		escape = function( s ) {
+
+			return String( s ).replace( /[&<>"']/g, function( c ) {
+				return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[ c ];
+			});
+		},
+
+		literal = function( s ) {
+
+			return JSON.stringify( s ).replace( /</g, '\\u003c' ).replace( /\u2028/g, '\\u2028' ).replace( /\u2029/g, '\\u2029' );
+		},
+
+		hint = function( d ) {
+
+			var rows = [], plain = [], k, v, kind,
+			defaults = { dim:256, pad:4, mtx:-1, ecl:'M', ecb:1, vrb:0 };
+
+			for( k in d ) {
+				if( k in defaults && defaults[ k ] === d[ k ] ) continue;
+				if( 'pal' === k && '#000000' === d.pal[ 0 ] && 1 === d.pal.length ) continue;
+				v = 'msg' === k ? literal( d[ k ] ) : JSON.stringify( d[ k ] );
+				kind = 'number' === typeof d[ k ] ? 'num' : 'str';
+				plain.push( ( plain.length ? ',' : ' ' ) + k + ' : ' + v );
+				rows.push( ( rows.length ? ',' : ' ' ) + '<span class="key">' + k + '</span> : <span class="' + kind + '">' + escape( v ) + '</span>' );
+			}
+			source = 'QRCode({\n\n    ' + plain.join('\n    ') + '\n\n});';
+			code.innerHTML = '<span class="fn">QRCode</span>({\n\n    ' + rows.join('\n    ') + '\n\n});';
+		},
+
+		invalidate = function() {
+
+			revision++;
+			output = source = '';
+			save.disabled = copySvg.disabled = copyCode.disabled = true;
+		},
+
+		/* Keep existing rows and text nodes when only their values change. */
+		patch = function( target, next ) {
+
+			var i = 0, current, incoming;
+			while( i < next.childNodes.length ) {
+				incoming = next.childNodes[ i ];
+				current = target.childNodes[ i ];
+				if( !current ) target.appendChild( incoming.cloneNode(true) );
+				else if( !current.isEqualNode( incoming ) ) {
+					if( current.nodeType !== incoming.nodeType || current.nodeName !== incoming.nodeName ) target.replaceChild( incoming.cloneNode(true), current );
+					else if( 3 === current.nodeType ) current.nodeValue = incoming.nodeValue;
+					else {
+						Array.from( current.attributes ).forEach( function( a ) { if( !incoming.hasAttribute(a.name) ) current.removeAttribute(a.name); });
+						Array.from( incoming.attributes ).forEach( function( a ) { if( current.getAttribute(a.name) !== a.value ) current.setAttribute(a.name,a.value); });
+						patch( current, incoming );
+					}
+				}
+				i++;
+			}
+			while( target.childNodes.length > i ) target.lastChild.remove();
+		},
+
+		update = function() {
+
+			cancelAnimationFrame( timer );
+			timer = 0;
+			invalidate();
+			error.hidden = true;
+			get('count').textContent = Array.from( txt.value ).length + ' characters · ' + new Blob( [txt.value] ).size + ' UTF-8 bytes';
+			get('status').textContent = 'Generating…';
+
+			try {
+				if( !dim.checkValidity() || !pad.checkValidity() ) throw new Error('Enter a whole size from 64 to 61440 px and a quiet zone from 0 to 10.');
+
+				var time = performance.now(), data = {
+					 msg : txt.value
+					,dim : +dim.value
+					,pad : +pad.value
+					,mtx : +mask.value
+					,ecl : ecl.value
+					,ecb : boost.checked | 0
+					,pal : opaque.checked ? [fg.value] : [fg.value,bg.value]
+					,vrb : compact.checked ? 0 : 1
+				}, svg = QRCode( data ), elapsed = performance.now() - time,
+				matrix = svg.viewBox.baseVal.width - 2 * data.pad,
+				info = inspect( svg, matrix ), scroll = tabBody.scrollTop;
+
+				output = new XMLSerializer().serializeToString( svg );
+				box.replaceChildren( svg );
+				get('version').textContent = ( matrix - 17 ) / 4;
+				patch( get('metadata'), info.metadata );
+				patch( get('decoded'), info.decoded );
+				get('actual').textContent = info.actual;
+				get('matrix').textContent = matrix + ' × ' + matrix;
+				get('size').textContent = ( new Blob( [output] ).size / 1024 ).toFixed( 2 ) + ' KB';
+				get('time').textContent = elapsed.toFixed( 1 ) + ' ms';
+				get('status').textContent = 'Ready';
+				get('scan-note').textContent = data.pad < 4 ? 'A quiet zone of at least 4 modules is recommended for scanning.' : opaque.checked ? 'Use a light background when placing a transparent QR Code.' : 'Use dark modules on a light background for reliable scanning.';
+				hint( data );
+				tabBody.scrollTop = scroll;
+				save.disabled = copySvg.disabled = copyCode.disabled = false;
+			} catch( e ) {
+				error.textContent = 'Could not generate QR Code. ' + ( e.message || e );
+				error.hidden = false;
+				get('status').textContent = box.firstChild ? 'Check your input · showing previous result' : 'Check your input';
+			}
+		},
+
+		inspect = function( svg, size ) {
+
+			/* Read logical modules from the foreground path, independent of color and padding. */
+			var metadata = document.createDocumentFragment(), decodedView = document.createDocumentFragment(), actual,
+			canvas = document.createElement('canvas'), ctx = canvas.getContext('2d'),
+			path = new Path2D( svg.lastElementChild.getAttribute('d') ),
+			pixels, cell = function( x, y ) { return pixels[ ( y * size + x ) * 4 + 3 ] > 127 ? 1 : 0; },
+			a = 0, b = 0, va = 0, vb = 0, i, x, y, dark = 0, version = ( size - 17 ) / 4,
+			bch = function( data, count, polynomial, shift ) {
+				var bits = data;
+				while( count-- ) bits = bits << 1 ^ polynomial * ( bits >>> shift );
+				return data << ( shift + 1 ) | bits;
+			},
+			binary = function( value, length ) { return ( new Array( length + 1 ).join('0') + value.toString(2) ).slice( -length ); },
+			row = function( label, value ) {
+				var dt = document.createElement('dt'), dd = document.createElement('dd');
+				dt.textContent = label; dd.textContent = value;
+				metadata.appendChild( dt ); metadata.appendChild( dd );
+			};
+
+			canvas.width = canvas.height = size;
+			ctx.fill( path );
+			pixels = ctx.getImageData( 0, 0, size, size ).data;
+
+			for( i = 0; i < 6; i++ ) a |= cell( 8, i ) << i;
+			a |= cell( 8, 7 ) << 6 | cell( 8, 8 ) << 7 | cell( 7, 8 ) << 8;
+			for( i = 9; i < 15; i++ ) a |= cell( 14 - i, 8 ) << i;
+			for( i = 0; i < 8; i++ ) b |= cell( size - 1 - i, 8 ) << i;
+			for( i = 8; i < 15; i++ ) b |= cell( 8, size - 15 + i ) << i;
+
+			var unmasked = a ^ 0x5412, data = unmasked >>> 10,
+			level = ['M','L','H','Q'][ data >>> 3 ], actualMask = data & 7,
+			valid = bch( data, 10, 0x537, 9 ) === unmasked;
+
+			actual = 'ECL ' + level + ' · Mask ' + actualMask + ( valid && a === b ? ' · Format verified' : ' · Format check failed' );
+			row( 'Actual error correction', level + ( level !== ecl.value ? ' (boosted from ' + ecl.value + ')' : '' ) );
+			row( 'Actual mask', actualMask + ( +mask.value === -1 ? ' (automatic)' : ' (manual)' ) );
+			row( 'Format copy 1 · 15 bits', binary( a, 15 ) );
+			row( 'Format copy 2 · 15 bits', binary( b, 15 ) );
+			row( 'Format copies / BCH', ( a === b ? 'Match' : 'Mismatch' ) + ' / ' + ( valid ? 'Valid' : 'Invalid' ) );
+			row( 'Format XOR mask', '0x5412' );
+			row( 'ECL bits / mask bits', binary( data >>> 3, 2 ) + ' / ' + binary( actualMask, 3 ) );
+			row( 'Fixed dark module', cell( 8, size - 8 ) ? 'Present' : 'Missing' );
+			if( version >= 7 ) {
+				for( i = 0; i < 18; i++ ) {
+					x = size - 11 + i % 3; y = i / 3 | 0;
+					va |= cell( x, y ) << i; vb |= cell( y, x ) << i;
+				}
+				row( 'Version field', va >>> 12 );
+				row( 'Version copy 1 · 18 bits', binary( va, 18 ) );
+				row( 'Version copy 2 · 18 bits', binary( vb, 18 ) );
+				row( 'Version copies / BCH', ( va === vb ? 'Match' : 'Mismatch' ) + ' / ' + ( bch( va >>> 12, 12, 0x1f25, 11 ) === va && va >>> 12 === version ? 'Valid' : 'Invalid' ) );
+			} else row( 'Version field', 'Not present below version 7' );
+			for( y = 0; y < size; y++ ) for( x = 0; x < size; x++ ) dark += cell( x, y );
+			row( 'Dark / total modules', dark + ' / ' + size * size );
+			row( 'Dark coverage', ( 100 * dark / ( size * size ) ).toFixed(1) + '%' );
+			row( 'SVG viewBox', svg.getAttribute('viewBox') );
+			try {
+				var decoded = QRDemoDecode( cell, size, level, actualMask );
+				row( 'Reed–Solomon blocks', decoded.validBlocks + ' / ' + decoded.blocks + ' valid' );
+				row( 'ECC bytes per block', decoded.ecc );
+				row( 'Data / total codewords', decoded.dataBytes + ' / ' + decoded.totalBytes );
+				row( 'Remainder bits', decoded.remainder );
+				row( 'Payload segments', decoded.segments.length );
+				row( 'Decoded text vs input', decoded.text === txt.value ? 'Exact match' : 'Mismatch (see decoded text)' );
+				var heading = document.createElement('h3'), table = document.createElement('table'), tr, td;
+				heading.textContent = 'Decoded segments';
+				decodedView.appendChild( heading );
+				tr = document.createElement('tr');
+				['# / Mode','Length','Bits'].forEach( function( label ) { var th = document.createElement('th'); th.textContent = label; tr.appendChild(th); } );
+				table.appendChild(tr);
+				decoded.segments.forEach( function( segment, index ) {
+					tr = document.createElement('tr');
+					[ (index+1) + ' · ' + segment.mode, segment.units + ( segment.mode === 'Byte' ? ' bytes' : ' chars' ), segment.bits ].forEach( function( value ) { td = document.createElement('td'); td.textContent = value; tr.appendChild(td); } );
+					table.appendChild(tr);
+					tr = document.createElement('tr'); td = document.createElement('td'); td.colSpan = 3; td.className = 'segment-text'; td.textContent = segment.text; tr.appendChild(td); table.appendChild(tr);
+				});
+				decodedView.appendChild(table);
+				var note = document.createElement('p'); note.className = 'note'; note.textContent = 'Bits include mode and length headers. Byte lengths are UTF-8 bytes. Kanji is decoded through Shift JIS; a few Unicode mappings may differ from the input.';
+				decodedView.appendChild(note);
+			} catch( e ) {
+				row( 'Payload verification', e.message || e );
+			}
+			return { metadata:metadata, decoded:decodedView, actual:actual };
+		},
+
+		copy = function( text ) {
+
+			var stamp = revision;
+			if( !navigator.clipboard || !navigator.clipboard.writeText ) {
+				get('status').textContent = 'Clipboard unavailable. Download SVG or select the code to copy.';
+				return;
+			}
+			navigator.clipboard.writeText( text ).then( function() {
+				if( stamp === revision ) get('status').textContent = 'Copied to clipboard';
+			}, function() {
+				if( stamp === revision ) get('status').textContent = 'Clipboard blocked. Download SVG or select the code to copy.';
+			});
+		};
+
+		save.onclick = function() {
+
+			var a = document.createElement('a'), url = URL.createObjectURL( new Blob( [output], { type:'image/svg+xml;charset=utf-8' } ) );
+			a.href = url;
+			a.download = 'qrcode-' + new Date().toISOString().slice( 0, 19 ).replace( /[-:]/g, '' ).replace( 'T', '-' ) + '.svg';
+			document.body.appendChild( a );
+			a.click();
+			a.remove();
+			setTimeout( function() { URL.revokeObjectURL( url ); }, 1000 );
+			get('status').textContent = 'SVG download requested';
+		};
+		copySvg.onclick = function() { copy( output ); };
+		copyCode.onclick = function() { copy( source ); };
+
+		[dim,pad,mask,ecl,boost,fg,bg,opaque,compact].forEach( function( o ) { o.onchange = update; });
+		bg.onchange = function() { opaque.checked = false; update(); };
+		txt.oninput = function() {
+			invalidate();
+			get('status').textContent = composing ? 'Composing…' : 'Updating…';
+			if( !composing && !timer ) timer = requestAnimationFrame( update );
+		};
+		txt.oncompositionstart = function() { composing = true; cancelAnimationFrame( timer ); timer = 0; invalidate(); };
+		txt.oncompositionend = function() { composing = false; update(); };
+		document.querySelectorAll('[data-sample]').forEach( function( button ) {
+			button.onclick = function() {
+				var index = +button.getAttribute('data-sample'), list = samples[ index ], next = sampleIndex[ index ];
+				if( list[ next % list.length ] === txt.value ) next++;
+				txt.value = list[ next % list.length ];
+				sampleIndex[ index ] = next + 1;
+				update();
+			};
+		});
+		/* Tabs keep the inspector frame fixed; only their content scrolls. */
+		var inspector = document.querySelector('.inspector'), tabs = document.querySelectorAll('[role="tab"]'),
+		scrolls = {}, activeTab = 'tab-settings', tabBody = document.querySelector('.tab-body'),
+		selectTab = function( tab ) {
+			scrolls[ activeTab ] = tabBody.scrollTop;
+			tabs.forEach( function( item ) {
+				var selected = item === tab;
+				item.setAttribute( 'aria-selected', selected );
+				item.tabIndex = selected ? 0 : -1;
+				get( item.getAttribute('aria-controls') ).hidden = !selected;
+			});
+			activeTab = tab.id;
+			tabBody.scrollTop = scrolls[ activeTab ] || 0;
+		};
+		tabs.forEach( function( tab, index ) {
+			tab.onclick = function() { selectTab( tab ); };
+			tab.onkeydown = function( e ) {
+				var next = 'ArrowRight' === e.key ? ( index + 1 ) % tabs.length : 'ArrowLeft' === e.key ? ( index + tabs.length - 1 ) % tabs.length : 'Home' === e.key ? 0 : 'End' === e.key ? tabs.length - 1 : -1;
+				if( next < 0 ) return;
+				e.preventDefault(); selectTab( tabs[ next ] ); tabs[ next ].focus();
+			};
+		});
+		/* Drag on wide screens; narrower desktops dock the panel on the right. */
+		var handle = inspector.querySelector('.inspector-head'), drag = null;
+		handle.onpointerdown = function( e ) {
+			if( window.matchMedia('(max-width:1279px)').matches || e.button !== 0 ) return;
+			var rect = inspector.getBoundingClientRect();
+			drag = { x:e.clientX - rect.left, y:e.clientY - rect.top };
+			handle.setPointerCapture( e.pointerId );
+		};
+		handle.onpointermove = function( e ) {
+			if( !drag ) return;
+			inspector.style.right = 'auto';
+			inspector.style.left = Math.max( 0, Math.min( innerWidth - inspector.offsetWidth, e.clientX - drag.x ) ) + 'px';
+			inspector.style.top = Math.max( 0, Math.min( innerHeight - inspector.offsetHeight, e.clientY - drag.y ) ) + 'px';
+		};
+		handle.onpointerup = handle.onpointercancel = function() { drag = null; };
+		window.addEventListener( 'resize', function() { drag = null; inspector.style.left = inspector.style.top = inspector.style.right = ''; } );
+		get('reset').onclick = function() {
+			dim.value = 256; pad.value = 4; mask.value = -1; ecl.value = 'M';
+			boost.checked = opaque.checked = compact.checked = true;
+			fg.value = '#202127'; bg.value = '#ffffff';
+			update();
+		};
+
+		/* The visual viewport also shrinks when a phone opens its keyboard. */
+		var viewport = window.visualViewport,
+		fit = function() {
+			var height = viewport ? viewport.height : window.innerHeight;
+			document.documentElement.style.setProperty( '--visible-height', height + 'px' );
+			document.body.classList.toggle( 'typing', height < 500 && ( document.activeElement === txt || document.body.classList.contains('typing') ) );
+		};
+		txt.addEventListener( 'focus', fit );
+		txt.addEventListener( 'blur', fit );
+		window.addEventListener( 'resize', fit );
+		if( viewport ) viewport.addEventListener( 'resize', fit );
+
+		/* The mobile sheet scrolls over the sticky text and preview stage. */
+		var back = get('back-to-qr'),
+		showBack = function() {
+			var mobile = window.matchMedia('(max-width:800px)').matches,
+			stage = document.querySelector('.stage'),
+			progress = mobile ? Math.min( 1, Math.max( 0, window.scrollY / Math.max( 1, stage.offsetHeight ) ) ) : 0;
+			stage.style.setProperty( '--stage-dim', ( progress * .55 ).toFixed(3) );
+			back.hidden = !mobile || window.scrollY < 60;
+		},
+		returnToQr = function() {
+			if( !window.matchMedia('(max-width:800px)').matches ) return;
+			window.scrollTo({ top:0, behavior:window.matchMedia('(prefers-reduced-motion:reduce)').matches ? 'instant' : 'smooth' });
+		};
+		txt.addEventListener( 'focus', returnToQr );
+		window.addEventListener( 'scroll', showBack, { passive:true } );
+		window.addEventListener( 'resize', showBack );
+		back.onclick = function() {
+			if( document.activeElement === txt ) returnToQr();
+			else txt.focus({ preventScroll:true });
+		};
+		showBack();
+		fit();
+		update();
+	})();
+</script>
+</body>
+</html>
+
+
+
+
