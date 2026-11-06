@@ -362,7 +362,7 @@
 		dim = get('dim'), pad = get('pad'), mask = get('mask'), ecl = get('ecl'),
 		contours = get('contour-preview'), boost = get('boost'), fg = get('fg'), bg = get('bg'), opaque = get('opaque'), compact = get('compact'),
 		save = get('save'), copySvg = get('copy-svg'), copyCode = get('copy-code'),
-		output = '', source = '', composing = false, timer = 0, revision = 0,
+		output = '', source = '', composing = false, timer = 0, revision = 0, statusTimer = 0,
 		sampleIndex = [0,0,0,0],
 		samples = [
 			 [ 'https://github.com/datalog/qrcode-generator', 'https://example.org/hello?from=qr', 'https://en.wikipedia.org/wiki/QR_code' ]
@@ -442,7 +442,7 @@
 			get('count').removeAttribute('role');
 			txt.removeAttribute('aria-invalid');
 			get('count').textContent = Array.from( txt.value ).length + ' characters · ' + new Blob( [txt.value] ).size + ' UTF-8 bytes';
-			get('status').textContent = '';
+			setStatus( '' );
 
 			try {
 				if( !dim.checkValidity() || !pad.checkValidity() ) throw new Error('Enter a whole size from 64 to 61440 px and a quiet zone from 0 to 10.');
@@ -471,7 +471,7 @@
 				get('matrix').textContent = matrix + ' × ' + matrix;
 				get('size').textContent = ( new Blob( [output] ).size / 1024 ).toFixed( 2 ) + ' KB';
 				get('time').textContent = elapsed.toFixed( 1 ) + ' ms';
-				get('status').textContent = '';
+				setStatus( '' );
 				get('scan-note').textContent = data.pad < 4 ? 'A quiet zone of at least 4 modules is recommended for scanning.' : opaque.checked ? 'Use a light background when placing a transparent QR Code.' : 'Use dark modules on a light background for reliable scanning.';
 				hint( data );
 				tabBody.scrollTop = scroll;
@@ -480,7 +480,7 @@
 				get('count').setAttribute('role', 'alert');
 				get('count').textContent = 'Could not generate QR Code. ' + ( e.message || e );
 				txt.setAttribute('aria-invalid', 'true');
-				get('status').textContent = '';
+				setStatus( '' );
 			}
 		},
 
@@ -571,17 +571,26 @@
 			return { overview:overview, metadata:metadata, decoded:decodedView, actual:actual };
 		},
 
+		setStatus = function( text ) {
+
+			clearTimeout( statusTimer );
+			get('status').textContent = text;
+			if( text ) statusTimer = setTimeout( function() {
+				get('status').textContent = '';
+			}, 2000 );
+		},
+
 		copy = function( text ) {
 
 			var stamp = revision;
 			if( !navigator.clipboard || !navigator.clipboard.writeText ) {
-				get('status').textContent = 'Clipboard unavailable. Download SVG or select the code to copy.';
+				setStatus( 'Clipboard unavailable. Download SVG or select the code to copy.' );
 				return;
 			}
 			navigator.clipboard.writeText( text ).then( function() {
-				if( stamp === revision ) get('status').textContent = 'Copied to clipboard';
+				if( stamp === revision ) setStatus( 'Copied to clipboard' );
 			}, function() {
-				if( stamp === revision ) get('status').textContent = 'Clipboard blocked. Download SVG or select the code to copy.';
+				if( stamp === revision ) setStatus( 'Clipboard blocked. Download SVG or select the code to copy.' );
 			});
 		};
 
@@ -594,7 +603,7 @@
 			a.click();
 			a.remove();
 			setTimeout( function() { URL.revokeObjectURL( url ); }, 1000 );
-			get('status').textContent = 'SVG download requested';
+			setStatus( 'SVG download requested' );
 		};
 		copySvg.onclick = function() { copy( output ); };
 		copyCode.onclick = function() { copy( source ); };
@@ -603,7 +612,7 @@
 		bg.onchange = function() { opaque.checked = false; update(); };
 		txt.oninput = function() {
 			invalidate();
-			get('status').textContent = '';
+			setStatus( '' );
 			if( !composing && !timer ) timer = requestAnimationFrame( update );
 		};
 		txt.oncompositionstart = function() { composing = true; cancelAnimationFrame( timer ); timer = 0; invalidate(); };
