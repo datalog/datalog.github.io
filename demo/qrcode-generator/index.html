@@ -7,7 +7,7 @@
 	<link rel="icon" href="favicon.png" type="image/png"/>
 	<style>
 		* {margin:0; padding:0; box-sizing:border-box;}
-		:root {color-scheme:light; --ink:#202127; --muted:#777983; --line:#e7e7eb; --accent:#4855ca;}
+		:root {color-scheme:light; --ink:#202127; --muted:#777983; --line:#e7e7eb; --accent:#25a;}
 		html,body {height:100%;}
 		body {font:13px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif; color:var(--ink); background:#fff;}
 		button,input,select,textarea {font:inherit; color:inherit;}
@@ -18,25 +18,29 @@
 		button:disabled {opacity:.4; cursor:default;}
 		a {color:var(--accent); text-underline-offset:3px;}
 		[hidden] {display:none !important;}
+
 		main {height:100dvh; display:grid; grid-template-rows:minmax(0,1fr) 180px; overflow:hidden;}
 		.stage {display:contents;}
 		.mobile-nav {display:none;}
+
 		#box {display:flex; align-items:center; justify-content:center; min-height:0; padding:24px; overflow:hidden; background:url('data:image/gif;base64,R0lGODlhBgAGAIAAAO7u7t7e3iH5BAAAAAAALAAAAAAGAAYAAAIKhIOXgKGuDIOzAAA7') #eeeff1;}
 		#box svg {display:block; max-width:100%; max-height:100%; flex-shrink:1;}
+
 		.message {grid-row:2; min-height:0; display:flex; flex-direction:column; background:#fff; border-top:1px solid var(--line);}
-		.message:has(textarea:focus) {background:#edf5ff;}
+		.message:focus-within,.message:has(button:active) {background:#eef4fb;}
 		.message textarea:focus-visible {outline:none;}
 		.message-head {display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px 12px; padding:10px 20px 4px;}
 		.message-head label {font-size:11px; font-weight:600; color:var(--muted);}
 		.samples {display:flex; flex-wrap:wrap; gap:4px; align-items:center;}
 		.samples button {font-size:11px; padding:4px 9px; background:#f5f5fa; border-color:transparent;}
-		.message:has(textarea:focus) .samples button {background:#d5e6fc; color:#254b7a;}
-		.message:has(textarea:focus) .samples button:hover {background:#bfd8f8;}
+		.message:focus-within .samples button,.message:has(button:active) .samples button {background:#dbe8f7; color:#174c88;}
+		.message:focus-within .samples button:hover,.message:has(button:active) .samples button:hover {background:#cbdff4;}
 		.message:has(textarea[aria-invalid='true']) {background:#fff0f3;}
 		.message:has(textarea[aria-invalid='true']) .samples button {background:#f7dce4; color:#80344a;}
 		textarea {display:block; flex:1; min-height:0; width:100%; border:0; background:transparent; resize:none; padding:6px 24px; text-align:center; font-size:22px; line-height:1.5;}
 		.input-foot {display:flex; justify-content:space-between; gap:12px; padding:6px 20px 10px; font-size:10px; color:var(--muted);}
 		.message:has(textarea[aria-invalid='true']) #count {color:#a23131;}
+
 		.inspector {position:fixed; z-index:5; top:24px; right:24px; width:400px; max-width:calc(100vw - 32px); height:min(690px,calc(100dvh - 220px)); min-height:250px; display:flex; flex-direction:column; background:#fff; border:1px solid #dcdce4; border-radius:9px; box-shadow:0 10px 40px #20212724; overflow:hidden;}
 		.inspector-head {display:flex; justify-content:space-between; align-items:center; gap:12px; padding:18px 18px 24px; cursor:move; touch-action:none; flex:none;}
 		h1 {font-size:17px; font-weight:650; letter-spacing:-.5px;}
@@ -44,18 +48,20 @@
 		.actions {display:flex; gap:8px; padding:0 18px 26px; flex:none;}
 		.actions button {flex:1; font-size:12px;}
 		.primary {background:var(--accent); border-color:var(--accent); color:#fff;}
-		.primary:hover {background:#3945b3;}
+		.primary:hover {background:#0d4488;}
 		#status {position:absolute; z-index:3; bottom:12px; left:18px; right:18px; padding:8px 12px; background:#fff; border:1px solid var(--line); border-radius:5px; box-shadow:0 3px 14px #20212715; font-size:11px; color:var(--muted); pointer-events:none;}
 		#status:empty {display:none;}
+
 		.tabs {display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); background:#fafafd; padding:0 6px; flex:none;}
 		.tabs button {display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; min-height:68px; border:0; border-bottom:2px solid transparent; border-radius:0; padding:9px 3px; background:transparent; color:var(--muted); font-size:10px;}
 		.tabs svg {width:20px; height:20px;}
-		.tabs [aria-selected='true'] {color:var(--accent); border-bottom-color:var(--accent); background:#f1f2fc;}
+		.tabs [aria-selected='true'] {color:var(--accent); border-bottom-color:var(--accent); background:#edf3fa;}
 		.tab-body {min-height:0; flex:1; overflow-y:auto; overscroll-behavior:contain; scrollbar-gutter:stable; overflow-anchor:none;}
 		.tab-panel {padding:18px;}
 		.tab-panel:focus-visible {outline-offset:-3px;}
 		h2 {font-size:13px; font-weight:600; margin-bottom:14px;}
 		h3 {font-size:10px; letter-spacing:1.3px; text-transform:uppercase; color:var(--muted); margin-bottom:14px;}
+
 		.settings section + section {border-top:1px solid var(--line); margin-top:18px; padding-top:18px;}
 		.section-head {display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;}
 		.section-head h2 {margin:0;}
@@ -63,7 +69,10 @@
 		.field {display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:13px;}
 		.field:first-of-type {margin-top:0;}
 		select,input[type='number'] {appearance:none; width:120px; padding:7px 2px; background:transparent; border:0; border-bottom:1px solid #cbcdd7; border-radius:0;}
-		select {padding-right:18px; background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='m2 2 4 4 4-4' fill='none' stroke='%23777983'/%3E%3C/svg%3E") no-repeat right center;}
+		select {padding-right:18px;}
+		.select-control {position:relative; width:120px; flex-shrink:0;}
+		.select-control select {width:100%;}
+		.select-control > svg {position:absolute; right:0; top:50%; width:12px; height:8px; transform:translateY(-50%); color:var(--muted); pointer-events:none;}
 		input[type='number'] {width:85px; text-align:right;}
 		input[type='checkbox'] {appearance:none; width:32px; height:19px; border-radius:12px; background:#d7d8df; position:relative; flex-shrink:0;}
 		input[type='checkbox']:before {content:''; position:absolute; width:13px; height:13px; top:3px; left:3px; border-radius:50%; background:#fff;}
@@ -73,14 +82,16 @@
 		input[type='color']::-webkit-color-swatch-wrapper {padding:2px;}
 		input[type='color']::-webkit-color-swatch {border:1px solid #ddd; border-radius:5px;}
 		.note {font-size:11px; color:var(--muted); margin-top:12px;}
+
 		.stats {display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; margin-bottom:22px;}
 		.stats div {padding:12px; border:1px solid var(--line); border-radius:6px; background:#f8f8fc;}
 		.stats dt {font-size:10px; color:var(--muted); margin-bottom:5px;}
 		.stats dd {font:18px Consolas,monospace;}
-		#actual {display:block; color:var(--accent); font-size:11px; margin:-6px 0 18px;}
+		#actual {display:block; color:var(--accent); font-size:11px; margin:14px 0 18px;}
 		#overview,#metadata {display:grid; grid-template-columns:1fr 1fr; font-size:11px; gap:9px 14px;}
 		#overview dt,#metadata dt {color:var(--muted);}
 		#overview dd,#metadata dd {font-family:Consolas,monospace; overflow-wrap:anywhere;}
+
 		.technical {margin-top:22px; border-top:1px solid var(--line); padding-top:14px;}
 		.technical summary {cursor:pointer; font-size:12px; padding:5px 0;}
 		.technical #metadata {margin-top:14px;}
@@ -88,22 +99,28 @@
 		#decoded table {border-collapse:collapse; width:100%; font-size:11px;}
 		#decoded th,#decoded td {padding:6px 3px; text-align:left; border-bottom:1px solid var(--line);}
 		#decoded .segment-text {white-space:pre-wrap; overflow-wrap:anywhere; color:var(--muted); padding-bottom:12px; font-family:Consolas,monospace;}
+
 		pre {font:12px/1.8 Consolas,monospace; white-space:pre-wrap; overflow-wrap:anywhere; padding:14px; background:#f8f8fc; border:1px solid var(--line); border-radius:5px;}
 		.fn {color:var(--accent); font-weight:bold;}
 		.comment {color:var(--muted);}
-		.key {color:#496c83;} .str {color:#8a5b2b;} .num {color:#795797;}
+		.key {color:#496c83;}
+		.str {color:#8a5b2b;}
+		.num {color:#795797;}
 		.links {display:flex; flex-direction:column; gap:9px; margin-top:22px; font-size:12px;}
+
 		@media(min-width:1280px) {
 			.inspector {height:min(860px,calc(100dvh - 220px));}
 			main {grid-template-rows:minmax(0,1fr); padding-bottom:204px; background:url('data:image/gif;base64,R0lGODlhBgAGAIAAAO7u7t7e3iH5BAAAAAAALAAAAAAGAAYAAAIKhIOXgKGuDIOzAAA7') #eeeff1;}
 			.message {position:fixed; z-index:4; left:50%; bottom:20px; transform:translateX(-50%); width:calc(100% - 48px); max-width:1120px; height:164px; border:1px solid #dcdce4; border-radius:9px; box-shadow:0 8px 32px #20212718; overflow:hidden;}
 		}
+
 		@media(min-width:801px) and (max-width:1279px) {
 			main {margin-right:360px;}
 			.inspector {top:0; right:0; width:360px; max-width:none; height:100dvh; min-height:0; border:0; border-left:1px solid var(--line); border-radius:0; box-shadow:none;}
 			.inspector-head {cursor:default; touch-action:auto;}
 			.grip {display:none;}
 		}
+
 		@media(max-width:800px) {
 			main {display:block; height:auto; min-height:100dvh; overflow:visible; isolation:isolate; padding-bottom:calc(68px + env(safe-area-inset-bottom));}
 			.stage {display:flex; flex-direction:column; position:sticky; top:0; z-index:0;}
@@ -131,7 +148,7 @@
 			.mobile-nav {display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); position:fixed; z-index:20; left:0; right:0; bottom:0; padding:0 6px env(safe-area-inset-bottom); background:#fff; border-top:1px solid var(--line); box-shadow:0 -3px 18px #2021270b;}
 			.mobile-nav button {display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; min-height:64px; border:0; border-radius:0; background:transparent; color:var(--muted); font-size:10px;}
 			.mobile-nav svg {width:21px; height:21px; fill:none; stroke:currentColor; stroke-width:1.5;}
-			.mobile-nav [aria-current='true'] {background:#f1f2fc; color:var(--accent);}
+			.mobile-nav [aria-current='true'] {background:#edf3fa; color:var(--accent);}
 			body.typing .mobile-nav {bottom:var(--viewport-bottom,0px);}
 		}
 	</style>
@@ -139,51 +156,201 @@
 	<script src="qrcode-demo-decode.min.js"></script>
 </head>
 <body>
-<main>
-	<div class="stage">
-	<div id="box" role="img" aria-label="Generated QR Code"></div>
-	<section class="message" aria-labelledby="message-title">
-		<div class="message-head"><label id="message-title" for="msg">Your message</label><div id="samples" class="samples" role="group" aria-label="Example messages"><button type="button" data-sample="0">URL</button><button type="button" data-sample="1">Numeric</button><button type="button" data-sample="2">日本語</button><button type="button" data-sample="3">Mixed + emoji</button></div></div>
-		<textarea id="msg" spellcheck="false" aria-describedby="count">https://github.com/datalog/qrcode-generator</textarea>
-		<div class="input-foot"><span id="count"></span><span>Text stays in your browser.</span></div>
-	</section>
-	</div>
-	<aside class="inspector" aria-labelledby="playground-title">
-		<div class="inspector-head"><h1 id="playground-title">QR Code playground</h1><span class="grip" aria-hidden="true">⠿</span></div>
-		<div class="actions"><button id="save" class="primary" type="button">Download SVG ↓</button><button id="copy-svg" type="button">Copy SVG</button></div>
-		<p id="status" role="status" aria-live="polite"></p>
-		<div class="tabs" role="tablist" aria-label="Playground tools">
-			<button id="tab-settings" role="tab" aria-selected="true" aria-controls="pane-settings" tabindex="0" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="3"/><circle cx="15" cy="17" r="3"/></svg><span>Settings</span></button>
-			<button id="tab-inside" role="tab" aria-selected="false" aria-controls="pane-inside" tabindex="-1" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 3h6v6H3zM15 3h6v6h-6zM3 15h6v6H3zM15 15h2v2h-2zM19 19h2v2h-2zM19 13h2v2h-2zM13 19h2v2h-2z"/></svg><span>Inside this QR Code</span></button>
-			<button id="tab-code" role="tab" aria-selected="false" aria-controls="pane-code" tabindex="-1" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m8 6-6 6 6 6m8-12 6 6-6 6m-3-15-2 18"/></svg><span>Use it in your code</span></button>
-		</div>
-		<div class="tab-body">
-			<section id="pane-settings" class="tab-panel settings" role="tabpanel" aria-labelledby="tab-settings" tabindex="0"><div class="section-head"><h2>Settings</h2><button id="reset" class="small" type="button">Reset</button></div><section><h3>Encoding</h3>
-				<div class="field"><label for="ecl">Error correction</label><select id="ecl"><option value="L">L · Low</option><option value="M" selected>M · Medium</option><option value="Q">Q · Quartile</option><option value="H">H · High</option></select></div>
-				<div class="field"><label for="boost">Boost correction</label><input id="boost" type="checkbox" checked/></div>
-				<p class="note">Raises correction when it fits the same QR version.</p>
-				<div class="field"><label for="mask">Mask pattern</label><select id="mask"><option value="-1">Automatic</option><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option></select></div>
+	<svg id="icons" xmlns="http://www.w3.org/2000/svg" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;overflow:hidden">
+		<defs>
+			<symbol id="icon-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="3"/><circle cx="15" cy="17" r="3"/></symbol>
+			<symbol id="icon-qr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h6v6H3zM15 3h6v6h-6zM3 15h6v6H3zM15 15h2v2h-2zM19 19h2v2h-2zM19 13h2v2h-2zM13 19h2v2h-2z"/></symbol>
+			<symbol id="icon-code" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m8 6-6 6 6 6m8-12 6 6-6 6m-3-15-2 18"/></symbol>
+			<symbol id="icon-inside" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5M8 8h8v8H8z"/></symbol>
+			<symbol id="icon-chevron" viewBox="0 0 12 8" fill="none" stroke="currentColor"><path d="m2 2 4 4 4-4"/></symbol>
+		</defs>
+	</svg>
+	<main>
+		<div class="stage">
+			<div id="box" role="img" aria-label="Generated QR Code"></div>
+			<section class="message" aria-labelledby="message-title">
+				<div class="message-head">
+					<label id="message-title" for="msg">Your message</label>
+					<div id="samples" class="samples" role="group" aria-label="Example messages">
+						<button type="button" data-sample="0">URL</button>
+						<button type="button" data-sample="1">Numeric</button>
+						<button type="button" data-sample="2">日本語</button>
+						<button type="button" data-sample="3">Mixed + emoji</button>
+					</div>
+				</div>
+				<textarea id="msg" spellcheck="false" aria-describedby="count">https://github.com/datalog/qrcode-generator</textarea>
+				<div class="input-foot">
+					<span id="count"></span>
+					<span>Text stays in your browser.</span>
+				</div>
 			</section>
-			<section><h3>Appearance</h3>
-				<div class="field"><label for="dim">Size · px</label><input id="dim" type="number" value="256" min="64" max="61440" step="1" required/></div>
-				<div class="field"><label for="pad">Quiet zone · modules</label><input id="pad" type="number" value="4" min="0" max="10" step="1" required/></div>
-				<div class="field"><label for="fg">Foreground</label><input id="fg" type="color" value="#202127"/></div>
-				<div class="field"><label for="bg">Background</label><input id="bg" type="color" value="#ffffff"/></div>
-				<div class="field"><label for="opaque">Transparent background</label><input id="opaque" type="checkbox" checked/></div>
-				<p class="note" id="scan-note">Use a light background when placing a transparent QR Code.</p>
-			</section>
-			<section><div class="field"><label for="compact">Compact SVG path</label><input id="compact" type="checkbox" checked/></div><p class="note">Same QR Code, fewer path commands.</p></section></section>
-			<section id="pane-inside" class="tab-panel diagnostics" role="tabpanel" aria-labelledby="tab-inside" tabindex="0" hidden><dl class="stats"><div><dt>QR version</dt><dd id="version">—</dd></div><div><dt>Matrix</dt><dd id="matrix">—</dd></div><div><dt>SVG size</dt><dd id="size">—</dd></div><div><dt>Generation</dt><dd id="time">—</dd></div></dl><h2>Inside this QR Code</h2><span id="actual">—</span><dl id="overview"></dl><div id="decoded"></div><details class="technical" open><summary>Technical details · bits &amp; checks</summary><dl id="metadata"></dl><p class="note">Read from the generated SVG modules. Format and version fields are checked against their BCH codes and duplicate copies. Payload segments are decoded and compared with your input. Reed–Solomon blocks are checked for errors; damage is not repaired.</p></details></section>
-			<section id="pane-code" class="tab-panel snippet" role="tabpanel" aria-labelledby="tab-code" tabindex="0" hidden><div class="section-head"><h2>Use it in your code</h2><button id="copy-code" class="small" type="button">Copy code</button></div><pre><code id="code"></code></pre><nav class="links" aria-label="Resources"><a href="https://github.com/datalog/qrcode-generator/blob/main/qrcode.js">Source code ↗</a><a href="https://github.com/datalog/qrcode-generator">Documentation ↗</a><a href="https://datalog.github.io/demo/qrcode-svg/">Simple version (2020) ↗</a></nav></section>
 		</div>
-	</aside>
-</main>
-<nav class="mobile-nav" aria-label="Playground navigation">
-	<button type="button" data-view="qr" aria-current="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h6v6H3zM15 3h6v6h-6zM3 15h6v6H3zM15 15h2v2h-2zM19 19h2v2h-2zM19 13h2v2h-2zM13 19h2v2h-2z"/></svg><span>QR</span></button>
-	<button type="button" data-view="settings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="3"/><circle cx="15" cy="17" r="3"/></svg><span>Settings</span></button>
-	<button type="button" data-view="inside"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5M8 8h8v8H8z"/></svg><span>Inside</span></button>
-	<button type="button" data-view="code"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 6-6 6 6 6m8-12 6 6-6 6m-3-15-2 18"/></svg><span>Code</span></button>
-</nav>
+		<aside class="inspector" aria-labelledby="playground-title">
+			<div class="inspector-head">
+				<h1 id="playground-title">QR Code playground</h1>
+				<span class="grip" aria-hidden="true">⠿</span>
+			</div>
+			<div class="actions">
+				<button id="save" class="primary" type="button">Download SVG ↓</button>
+				<button id="copy-svg" type="button">Copy SVG</button>
+			</div>
+			<p id="status" role="status" aria-live="polite"></p>
+			<div class="tabs" role="tablist" aria-label="Playground tools">
+				<button id="tab-settings" role="tab" aria-selected="true" aria-controls="pane-settings" tabindex="0" type="button">
+					<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-settings"/></svg>
+					<span>Settings</span>
+				</button>
+				<button id="tab-inside" role="tab" aria-selected="false" aria-controls="pane-inside" tabindex="-1" type="button">
+					<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-qr"/></svg>
+					<span>Inside this QR Code</span>
+				</button>
+				<button id="tab-code" role="tab" aria-selected="false" aria-controls="pane-code" tabindex="-1" type="button">
+					<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-code"/></svg>
+					<span>Use it in your code</span>
+				</button>
+			</div>
+			<div class="tab-body">
+				<section id="pane-settings" class="tab-panel settings" role="tabpanel" aria-labelledby="tab-settings" tabindex="0">
+					<div class="section-head">
+						<h2>Settings</h2>
+						<button id="reset" class="small" type="button">Reset</button>
+					</div>
+					<section>
+						<h3>Encoding</h3>
+						<div class="field">
+							<label for="ecl">Error correction</label>
+							<span class="select-control">
+								<select id="ecl">
+									<option value="L">L · Low</option>
+									<option value="M" selected>M · Medium</option>
+									<option value="Q">Q · Quartile</option>
+									<option value="H">H · High</option>
+								</select>
+								<svg viewBox="0 0 12 8" aria-hidden="true"><use href="#icon-chevron"/></svg>
+							</span>
+						</div>
+						<div class="field">
+							<label for="boost">Boost correction</label>
+							<input id="boost" type="checkbox" checked/>
+						</div>
+						<p class="note">Raises correction when it fits the same QR version.</p>
+						<div class="field">
+							<label for="mask">Mask pattern</label>
+							<span class="select-control">
+								<select id="mask">
+									<option value="-1">Automatic</option>
+									<option value="0">0</option>
+									<option value="1">1</option>
+									<option value="2">2</option>
+									<option value="3">3</option>
+									<option value="4">4</option>
+									<option value="5">5</option>
+									<option value="6">6</option>
+									<option value="7">7</option>
+								</select>
+								<svg viewBox="0 0 12 8" aria-hidden="true"><use href="#icon-chevron"/></svg>
+							</span>
+						</div>
+					</section>
+					<section>
+						<h3>Appearance</h3>
+						<div class="field">
+							<label for="dim">Size · px</label>
+							<input id="dim" type="number" value="256" min="64" max="61440" step="1" required/>
+						</div>
+						<div class="field">
+							<label for="pad">Quiet zone · modules</label>
+							<input id="pad" type="number" value="4" min="0" max="10" step="1" required/>
+						</div>
+						<div class="field">
+							<label for="fg">Foreground</label>
+							<input id="fg" type="color" value="#202127"/>
+						</div>
+						<div class="field">
+							<label for="bg">Background</label>
+							<input id="bg" type="color" value="#ffffff"/>
+						</div>
+						<div class="field">
+							<label for="opaque">Transparent background</label>
+							<input id="opaque" type="checkbox" checked/>
+						</div>
+						<p class="note" id="scan-note">Use a light background when placing a transparent QR Code.</p>
+					</section>
+					<section>
+						<div class="field">
+							<label for="compact">Compact SVG path</label>
+							<input id="compact" type="checkbox" checked/>
+						</div>
+						<p class="note">Same QR Code, fewer path commands.</p>
+					</section>
+				</section>
+				<section id="pane-inside" class="tab-panel diagnostics" role="tabpanel" aria-labelledby="tab-inside" tabindex="0" hidden>
+					<dl class="stats">
+						<div>
+							<dt>QR version</dt>
+							<dd id="version">—</dd>
+						</div>
+						<div>
+							<dt>Matrix</dt>
+							<dd id="matrix">—</dd>
+						</div>
+						<div>
+							<dt>SVG size</dt>
+							<dd id="size">—</dd>
+						</div>
+						<div>
+							<dt>Generation</dt>
+							<dd id="time">—</dd>
+						</div>
+					</dl>
+					<h2>Inside this QR Code</h2>
+					<label class="field" for="contour-preview">
+						<span>Explore SVG contours</span>
+						<input id="contour-preview" type="checkbox" role="switch">
+					</label>
+					<p class="note">Colors show separate contour paths. Pale areas mark enclosed cutouts. Available with optimized SVG.</p>
+					<span id="actual">—</span>
+					<dl id="overview"></dl>
+					<div id="decoded"></div>
+					<details class="technical" open>
+						<summary>Technical details · bits &amp; checks</summary>
+						<dl id="metadata"></dl>
+						<p class="note">Read from the generated SVG modules. Format and version fields are checked against their BCH codes and duplicate copies. Payload segments are decoded and compared with your input. Reed–Solomon blocks are checked for errors; damage is not repaired.</p>
+					</details>
+				</section>
+				<section id="pane-code" class="tab-panel snippet" role="tabpanel" aria-labelledby="tab-code" tabindex="0" hidden>
+					<div class="section-head">
+						<h2>Use it in your code</h2>
+						<button id="copy-code" class="small" type="button">Copy code</button>
+					</div>
+					<pre><code id="code"></code></pre>
+					<nav class="links" aria-label="Resources">
+						<a href="https://github.com/datalog/qrcode-generator/blob/main/qrcode.js">Source code ↗</a>
+						<a href="https://github.com/datalog/qrcode-generator">Documentation ↗</a>
+						<a href="https://datalog.github.io/demo/qrcode-svg/">Simple version (2020) ↗</a>
+					</nav>
+				</section>
+			</div>
+		</aside>
+	</main>
+	<nav class="mobile-nav" aria-label="Playground navigation">
+		<button type="button" data-view="qr" aria-current="true">
+			<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-qr"/></svg>
+			<span>QR</span>
+		</button>
+		<button type="button" data-view="settings">
+			<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-settings"/></svg>
+			<span>Settings</span>
+		</button>
+		<button type="button" data-view="inside">
+			<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-inside"/></svg>
+			<span>Inside</span>
+		</button>
+		<button type="button" data-view="code">
+			<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-code"/></svg>
+			<span>Code</span>
+		</button>
+	</nav>
 <script>
 	'use strict';
 
@@ -193,7 +360,7 @@
 		get = function( id ) { return document.getElementById( id ); },
 		box = get('box'), txt = get('msg'), code = get('code'),
 		dim = get('dim'), pad = get('pad'), mask = get('mask'), ecl = get('ecl'),
-		boost = get('boost'), fg = get('fg'), bg = get('bg'), opaque = get('opaque'), compact = get('compact'),
+		contours = get('contour-preview'), boost = get('boost'), fg = get('fg'), bg = get('bg'), opaque = get('opaque'), compact = get('compact'),
 		save = get('save'), copySvg = get('copy-svg'), copyCode = get('copy-code'),
 		output = '', source = '', composing = false, timer = 0, revision = 0,
 		sampleIndex = [0,0,0,0],
@@ -291,6 +458,8 @@
 				info = inspect( svg, matrix ), scroll = tabBody.scrollTop;
 
 				output = new XMLSerializer().serializeToString( svg );
+				contours.disabled = !compact.checked;
+				if( contours.checked && compact.checked ) QRDemoContourPreview( svg );
 				box.replaceChildren( svg );
 				get('version').textContent = ( matrix - 17 ) / 4;
 				patch( get('overview'), info.overview );
@@ -428,7 +597,7 @@
 		copySvg.onclick = function() { copy( output ); };
 		copyCode.onclick = function() { copy( source ); };
 
-		[dim,pad,mask,ecl,boost,fg,bg,opaque,compact].forEach( function( o ) { o.onchange = update; });
+		[dim,pad,mask,ecl,boost,fg,bg,opaque,compact,contours].forEach( function( o ) { o.onchange = update; });
 		bg.onchange = function() { opaque.checked = false; update(); };
 		txt.oninput = function() {
 			invalidate();
@@ -444,6 +613,8 @@
 				txt.value = list[ next % list.length ];
 				sampleIndex[ index ] = next + 1;
 				update();
+				txt.focus( { preventScroll:true } );
+				txt.setSelectionRange( txt.value.length, txt.value.length );
 			};
 		});
 		/* Tabs keep the inspector frame fixed; only their content scrolls. */
@@ -584,10 +755,3 @@
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
