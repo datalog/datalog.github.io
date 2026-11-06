@@ -433,6 +433,9 @@
 
 		update = function() {
 
+			contours.disabled = !compact.checked;
+			if( contours.disabled ) contours.checked = false;
+
 			cancelAnimationFrame( timer );
 			timer = 0;
 			invalidate();
@@ -458,8 +461,7 @@
 				info = inspect( svg, matrix ), scroll = tabBody.scrollTop;
 
 				output = new XMLSerializer().serializeToString( svg );
-				contours.disabled = !compact.checked;
-				if( contours.checked && compact.checked ) QRDemoContourPreview( svg );
+				if( contours.checked ) QRDemoContourPreview( svg );
 				box.replaceChildren( svg );
 				get('version').textContent = ( matrix - 17 ) / 4;
 				patch( get('overview'), info.overview );
@@ -660,6 +662,7 @@
 		get('reset').onclick = function() {
 			dim.value = 256; pad.value = 4; mask.value = -1; ecl.value = 'M';
 			boost.checked = opaque.checked = compact.checked = true;
+			contours.checked = false;
 			fg.value = '#202127'; bg.value = '#ffffff';
 			update();
 		};
