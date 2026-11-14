@@ -1,45 +1,45 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 340">
-  <rect width="1040" height="340" rx="16" fill="#15191f"/>
+  <rect width="1040" height="340" fill="#112"/>
   <style>
-    text{font-family:Arial,sans-serif;fill:#e8edf4}
+    text{font-family:Arial,sans-serif;fill:#eee}
     .mono{font-family:Consolas,monospace;font-size:18px;text-anchor:middle;dominant-baseline:central}
     .edge{fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
   </style>
   <defs>
-    <marker id="r" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1l5 3-5 3" fill="none" stroke="#6dcfff" stroke-width="1.4"/></marker>
-    <marker id="d" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1l5 3-5 3" fill="none" stroke="#ba9aff" stroke-width="1.4"/></marker>
-    <marker id="l" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1l5 3-5 3" fill="none" stroke="#ffd17a" stroke-width="1.4"/></marker>
-    <marker id="u" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1l5 3-5 3" fill="none" stroke="#77ddb1" stroke-width="1.4"/></marker>
+    <marker id="r" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1l5 3-5 3" fill="none" stroke="#6cf" stroke-width="1.4"/></marker>
+    <marker id="d" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1l5 3-5 3" fill="none" stroke="#b9f" stroke-width="1.4"/></marker>
+    <marker id="l" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1l5 3-5 3" fill="none" stroke="#fc7" stroke-width="1.4"/></marker>
+    <marker id="u" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1l5 3-5 3" fill="none" stroke="#7da" stroke-width="1.4"/></marker>
   </defs>
-  <path d="M520 24v292" stroke="#35404f"/>
+  <path d="M520 24v292" stroke="#345"/>
   <g transform="translate(20,-76)">
 
-  <path d="M130 136h220v110H240v110H130z" fill="#303d50"/>
-  <path d="M240 136v110M130 246h110" stroke="#526076" stroke-dasharray="4 6"/>
-  <path d="M142 136h196" class="edge" stroke="#6dcfff" marker-end="url(#r)"/>
-  <path d="M350 148v86" class="edge" stroke="#ba9aff" marker-end="url(#d)"/>
-  <path d="M338 246h-86" class="edge" stroke="#ffd17a" marker-end="url(#l)"/>
-  <path d="M240 258v86" class="edge" stroke="#ba9aff" marker-end="url(#d)"/>
-  <path d="M228 356h-86" class="edge" stroke="#ffd17a" marker-end="url(#l)"/>
-  <path d="M130 344V148" class="edge" stroke="#77ddb1" marker-end="url(#u)"/>
-  <circle cx="130" cy="136" r="5" fill="#e8edf4"/>
-  <text x="240" y="112" class="mono" style="fill:#6dcfff">1</text>
-  <text x="374" y="191" class="mono" style="fill:#ba9aff">2</text>
-  <text x="295" y="222" class="mono" style="fill:#ffd17a">4</text>
-  <text x="264" y="301" class="mono" style="fill:#ba9aff">2</text>
-  <text x="185" y="380" class="mono" style="fill:#ffd17a">4</text>
-  <text x="106" y="246" class="mono" style="fill:#77ddb1">8</text>
+  <path d="M130 136h220v110H240v110H130z" fill="#345"/>
+  <path d="M240 136v110M130 246h110" stroke="#567" stroke-dasharray="4 6"/>
+  <path d="M142 136h196" class="edge" stroke="#6cf" marker-end="url(#r)"/>
+  <path d="M350 148v86" class="edge" stroke="#b9f" marker-end="url(#d)"/>
+  <path d="M338 246h-86" class="edge" stroke="#fc7" marker-end="url(#l)"/>
+  <path d="M240 258v86" class="edge" stroke="#b9f" marker-end="url(#d)"/>
+  <path d="M228 356h-86" class="edge" stroke="#fc7" marker-end="url(#l)"/>
+  <path d="M130 344V148" class="edge" stroke="#7da" marker-end="url(#u)"/>
+  <circle cx="130" cy="136" r="5" fill="#eee"/>
+  <text x="240" y="112" class="mono" style="fill:#6cf">1</text>
+  <text x="374" y="191" class="mono" style="fill:#b9f">2</text>
+  <text x="295" y="222" class="mono" style="fill:#fc7">4</text>
+  <text x="264" y="301" class="mono" style="fill:#b9f">2</text>
+  <text x="185" y="380" class="mono" style="fill:#fc7">4</text>
+  <text x="106" y="246" class="mono" style="fill:#7da">8</text>
 
   </g>
   <g transform="translate(0,-50)">
-  <circle cx="780" cy="220" r="5" fill="#e8edf4"/>
-  <path d="M791 220h99" class="edge" stroke="#6dcfff" marker-end="url(#r)"/>
-  <path d="M780 231v99" class="edge" stroke="#ba9aff" marker-end="url(#d)"/>
-  <path d="M769 220h-99" class="edge" stroke="#ffd17a" marker-end="url(#l)"/>
-  <path d="M780 209v-99" class="edge" stroke="#77ddb1" marker-end="url(#u)"/>
-  <text x="914" y="220" class="mono" style="fill:#6dcfff;text-anchor:start">1 / 0001</text>
-  <text x="780" y="354" class="mono" style="fill:#ba9aff">2 / 0010</text>
-  <text x="646" y="220" class="mono" style="fill:#ffd17a;text-anchor:end">4 / 0100</text>
-  <text x="780" y="86" class="mono" style="fill:#77ddb1">8 / 1000</text>
+  <circle cx="780" cy="220" r="5" fill="#eee"/>
+  <path d="M791 220h99" class="edge" stroke="#6cf" marker-end="url(#r)"/>
+  <path d="M780 231v99" class="edge" stroke="#b9f" marker-end="url(#d)"/>
+  <path d="M769 220h-99" class="edge" stroke="#fc7" marker-end="url(#l)"/>
+  <path d="M780 209v-99" class="edge" stroke="#7da" marker-end="url(#u)"/>
+  <text x="914" y="220" class="mono" style="fill:#6cf;text-anchor:start">1 / 0001</text>
+  <text x="780" y="354" class="mono" style="fill:#b9f">2 / 0010</text>
+  <text x="646" y="220" class="mono" style="fill:#fc7;text-anchor:end">4 / 0100</text>
+  <text x="780" y="86" class="mono" style="fill:#7da">8 / 1000</text>
   </g>
 </svg>
