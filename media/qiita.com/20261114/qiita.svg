@@ -1,0 +1,39 @@
+<svg viewBox="0 0 93 17" fill="#222" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg" version="1.1">
+<path fill="#fff" d="M0 0h93v17H0z"/>
+<path transform="matrix(1,0,0,1,2,2)" d="m27,13h-5v-5h1v-1h-1v-2h-1v2h-1v2h-1v2h-3v-2h-2v1h1v1h1v1h1v1h-1v-1h-1v1h-1v-2h-1v2h-1v-2h1v-1h-1v-1h-1v-1h1v-1h1v-1h-3v4h1v3h-1v-3h-1v1h-1v1h1v1h-1v-1h-1v1h-1v-2h1v-2h2v-2h-1v-1h2v-1h-2v-1h1v-1h-1v-1h2v1h1v1h1v-1h1v2h2v-1h1v-1h1v-1h-1v1h-2v-1h1v-1h-1v-1h1v1h1v-1h1v1h1v-1h1v1h1v1h1v-1h-1v-1h1v1h1v-1h1v1h-1v1h-1v2h2v2h1v1h1v-1h-1v-2h-1v-1h1v-3h3v3h-3v1h3v1h-2v1h2v1h-2v1h2zm-6,0h-1v-1h1zm-2,0h-1v-1h1zm-14,0h-1v-1h-1v1h-3v-3h1v2h2v-1h-1v-1h-1v-1h-1v-1h2v1h1v-1h1v1h1v-1h1v2h-2v-1h-1v2h2zm21-1v-3h-3v3zm-1-1h-1v-1h1zm-4,0h-1v-1h1zm-6-3v-1h1v-1h1v1h2v-1h1v-2h-3v1h2v1h-2v-1h-1v1h-2v2zm-8-1h-7v-7h7zm-1-1v-5h-5v5zm-1-1h-3v-3h3zm21-3v-1h-1v1zm-14,0h-1v-1h-1v-1h1v1h1v-1h1v1h-1zm-3-1h-1v-1h1z"></path>
+
+<g transform="matrix(1,0,0,1,33,2)" >
+<path d="m27,13h-5v-5h1v-1h-1v-2h-1v2h-1v2h-1v2h-3v-2h-2v1h1v1h1v1h1v1h-1v-1h-1v1h-1v-2h-1v2h-1v-2h1v-1h-1v-1h-1v-1h1v-1h1v-1h-3v4h1v3h-1v-3h-1v1h-1v1h1v1h-1v-1h-1v1h-1v-2h1v-2h2v-2h-1v-1h2v-1h-2v-1h1v-1h-1v-1h2v1h1v1h1v-1h1v2h2v-1h1v-1h1v-1h-1v1h-2v-1h1v-1h-1v-1h1v1h1v-1h1v1h1v-1h1v1h1v1h1v-1h-1v-1h1v1h1v-1h1v1h-1v1h-1v2h2v2h1v1h1v-1h-1v-2h-1v-1h1v-3h3v3h-3v1h3v1h-2v1h2v1h-2v1h2z" fill="#82d"></path>
+<path d="m21,13h-1v-1h1z" fill="#086"></path>
+<path d="m19,13h-1v-1h1z" fill="#d15"></path>
+<path d="m5,13h-1v-1h-1v1h-3v-3h1v2h2v-1h-1v-1h-1v-1h-1v-1h2v1h1v-1h1v1h1v-1h1v2h-2v-1h-1v2h2z" fill="#07c"></path>
+<path d="m26,12v-3h-3v3z" fill="#fc9"></path>
+<path d="m25,11h-1v-1h1z" fill="#43d"></path>
+<path d="m21,11h-1v-1h1z" fill="#182"></path>
+<path d="m15,8v-1h1v-1h1v1h2v-1h1v-2h-3v1h2v1h-2v-1h-1v1h-2v2z" fill="#f9e"></path>
+<path d="m7,7h-7v-7h7z" fill="#82d"></path>
+<path d="m6,6v-5h-5v5z" fill="#9ed"></path>
+<path d="m5,5h-3v-3h3z" fill="#d15"></path>
+<path d="m26,2v-1h-1v1z" fill="#9cf"></path>
+<path d="m12,2h-1v-1h-1v-1h1v1h1v-1h1v1h-1z" fill="#b40"></path>
+<path d="m9,1h-1v-1h1z" fill="#43d"></path>
+</g>
+
+<g transform="matrix(1,0,0,1,64,2)" fill="none" stroke-width=".16" stroke-linejoin="round" shape-rendering="geometricPrecision">
+<path d="m27,13h-5v-5h1v-1h-1v-2h-1v2h-1v2h-1v2h-3v-2h-2v1h1v1h1v1h1v1h-1v-1h-1v1h-1v-2h-1v2h-1v-2h1v-1h-1v-1h-1v-1h1v-1h1v-1h-3v4h1v3h-1v-3h-1v1h-1v1h1v1h-1v-1h-1v1h-1v-2h1v-2h2v-2h-1v-1h2v-1h-2v-1h1v-1h-1v-1h2v1h1v1h1v-1h1v2h2v-1h1v-1h1v-1h-1v1h-2v-1h1v-1h-1v-1h1v1h1v-1h1v1h1v-1h1v1h1v1h1v-1h-1v-1h1v1h1v-1h1v1h-1v1h-1v2h2v2h1v1h1v-1h-1v-2h-1v-1h1v-3h3v3h-3v1h3v1h-2v1h2v1h-2v1h2z" stroke="#82d"></path>
+<path d="m21,13h-1v-1h1z" stroke="#086"></path>
+<path d="m19,13h-1v-1h1z" stroke="#d15"></path>
+<path d="m5,13h-1v-1h-1v1h-3v-3h1v2h2v-1h-1v-1h-1v-1h-1v-1h2v1h1v-1h1v1h1v-1h1v2h-2v-1h-1v2h2z" stroke="#07c"></path>
+<path d="m26,12v-3h-3v3z" stroke="#fc9"></path>
+<path d="m25,11h-1v-1h1z" stroke="#43d"></path>
+<path d="m21,11h-1v-1h1z" stroke="#182"></path>
+<path d="m15,8v-1h1v-1h1v1h2v-1h1v-2h-3v1h2v1h-2v-1h-1v1h-2v2z" stroke="#f9e"></path>
+<path d="m7,7h-7v-7h7z" stroke="#82d"></path>
+<path d="m6,6v-5h-5v5z" stroke="#9ed"></path>
+<path d="m5,5h-3v-3h3z" stroke="#d15"></path>
+<path d="m26,2v-1h-1v1z" stroke="#9cf"></path>
+<path d="m12,2h-1v-1h-1v-1h1v1h1v-1h1v1h-1z" stroke="#b40"></path>
+<path d="m9,1h-1v-1h1z" stroke="#43d"></path>
+</g>
+
+</svg>
