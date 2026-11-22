@@ -220,9 +220,13 @@
 						<h3>Encoding</h3>
 						<div class="field">
                             <label for="shape">Symbol shape</label>
-                            <span class="select-control"><select id="shape"><option value="0">Square</option><option value="1">Prefer rectangle</option></select><svg viewBox="0 0 12 8" aria-hidden="true"><use href="#icon-chevron"/></svg></span>
+                            <span class="select-control"><select id="shape"><option value="0">Square</option><option value="1">Prefer rectangle</option><option value="2">Prefer rectangle + DMRE</option></select><svg viewBox="0 0 12 8" aria-hidden="true"><use href="#icon-chevron"/></svg></span>
                         </div>
-                        <p class="note">ECC 200 · automatic symbol size. Rectangular preference falls back to a square for longer messages.</p>
+                        <div class="field">
+                            <label for="ver">Symbol size</label>
+                            <span class="select-control"><select id="ver"><option value="">Auto</option></select><svg viewBox="0 0 12 8" aria-hidden="true"><use href="#icon-chevron"/></svg></span>
+                        </div>
+                        <p class="note">A fixed size overrides the shape preference. Auto rectangles fall back to a square when needed.</p>
                         <div class="field"><label for="esc">Recognize escapes and commands</label><input id="esc" type="checkbox"/></div>
                         <p class="note"><a href="https://github.com/datalog/datamatrix-svg#escapes-and-commands" target="_blank" rel="noopener">See supported commands</a></p>
 					</section>
@@ -329,7 +333,7 @@
 		var
 		get = function( id ) { return document.getElementById( id ); },
 		box = get('box'), txt = get('msg'), code = get('code'),
-		dim = get('dim'), pad = get('pad'), shape = get('shape'), esc = get('esc'),
+		dim = get('dim'), pad = get('pad'), shape = get('shape'), ver = get('ver'), esc = get('esc'),
 		contours = get('contour-preview'), fg = get('fg'), bg = get('bg'), opaque = get('opaque'), compact = get('compact'),
 		save = get('save'), copySvg = get('copy-svg'), copyCode = get('copy-code'),
 		output = '', source = '', composing = false, timer = 0, revision = 0, statusTimer = 0,
@@ -356,7 +360,7 @@
 		hint = function( d ) {
 
 			var rows = [], plain = [], k, v, kind,
-			defaults = { dim:256, pad:2, rct:0, vrb:0, esc:0 };
+			defaults = { dim:256, pad:2, rct:0, ver:'', vrb:0, esc:0 };
 
 			for( k in d ) {
 				if( k in defaults && defaults[ k ] === d[ k ] ) continue;
@@ -402,6 +406,7 @@
 
 		update = function() {
 
+			shape.disabled = !!ver.value;
 			contours.disabled = !compact.checked;
 			if( contours.disabled ) contours.checked = false;
 
@@ -420,7 +425,8 @@
 					 msg : txt.value
 					,dim : +dim.value
 					,pad : +pad.value
-					,rct : +shape.value
+					,rct : ver.value ? 0 : +shape.value
+					,ver : ver.value
 					,esc : +esc.checked
 					,pal : opaque.checked ? [fg.value] : [fg.value,bg.value]
 					,vrb : compact.checked ? 0 : 1
@@ -433,7 +439,7 @@
 				if( contours.checked ) DataMatrixDemoContourPreview( svg );
 				box.replaceChildren( svg );
                 box.setAttribute('aria-label',matrix.width+' × '+matrix.height+' · Generated Data Matrix ECC 200');
-				get('version').textContent = matrix.width === matrix.height ? 'Square' : 'Rectangle';
+				get('version').textContent = matrix.width === matrix.height ? 'Square' : info.dmre ? 'DMRE' : 'Rectangle';
 				patch( get('overview'), info.overview );
 				patch( get('metadata'), info.metadata );
 				patch( get('decoded'), info.decoded );
@@ -472,7 +478,7 @@
             row('Reed–Solomon blocks',info.validBlocks+' / '+info.blocks+' valid',true);
             row('Decoded text',esc.checked?'Commands expanded; see decoded output':decoded.text===txt.value?'Exact match':'Mismatch',true);
             row('Message type',decoded.gs1?'GS1':decoded.macro?'Macro 0'+decoded.macro:'Data Matrix',true);
-            row('Standard','ISO/IEC 16022');
+            row('Standard',info.dmre?'ISO/IEC 21471:2025':'ISO/IEC 16022');
             row('Data regions',info.columns+' × '+info.rows);
             row('Region data modules',info.regionWidth+' × '+info.regionHeight);
             row('Data / ECC codewords',info.dataBytes+' / '+info.eccBytes);
@@ -482,11 +488,11 @@
             row('SVG viewBox',svg.getAttribute('viewBox'));
             var full=document.createElement('pre'); full.textContent=decoded.text; decodedView.append(full);
             var heading=document.createElement('h3'),table=document.createElement('table'); heading.textContent='Decoded segments'; decodedView.append(heading,table);
-            decoded.segments.forEach(function(s) { var tr=document.createElement('tr'),td=document.createElement('td'); td.className='segment-text'; td.textContent=s.mode+' · '+s.bytes+' bytes\n'+(s.text===null?'UTF-8 fragment: '+s.hex:s.text); tr.append(td); table.append(tr); });
+            decoded.segments.forEach(function(s) { var tr=document.createElement('tr'),td=document.createElement('td'); td.className='segment-text'; td.textContent=s.mode+' · '+s.bytes+' bytes · '+s.codewords+' codewords\n'+(s.text===null?'UTF-8 fragment: '+s.hex:s.text); tr.append(td); table.append(tr); });
             var note=document.createElement('p'); note.className='note';
-            note.textContent='Lengths count decoded bytes, not codewords. UTF-8 characters may span segments; incomplete fragments are shown as hexadecimal bytes.';
+            note.textContent='Bytes count decoded data. Codewords include mode and length headers and explicit unlatches; leading GS1, Macro and ECI headers and padding are excluded. UTF-8 characters may span segments; incomplete fragments are shown as hexadecimal bytes.';
             decodedView.append(note);
-            return {overview:overview,metadata:metadata,decoded:decodedView,actual:matrix.width+' × '+matrix.height+' · ECC 200'};
+            return {overview:overview,metadata:metadata,decoded:decodedView,dmre:info.dmre,actual:matrix.width+' × '+matrix.height+(info.dmre?' · DMRE':' · ECC 200')};
         },
 
 		setStatus = function( text ) {
@@ -526,7 +532,7 @@
 		copySvg.onclick = function() { copy( output ); };
 		copyCode.onclick = function() { copy( source ); };
 
-		[dim,pad,shape,esc,fg,bg,opaque,compact,contours].forEach( function( o ) { o.onchange = update; });
+		[dim,pad,shape,ver,esc,fg,bg,opaque,compact,contours].forEach( function( o ) { o.onchange = update; });
 		bg.onchange = function() { opaque.checked = false; update(); };
 		txt.oninput = function() {
 			invalidate();
@@ -587,7 +593,7 @@
 		handle.onpointerup = handle.onpointercancel = function() { drag = null; };
 		window.addEventListener( 'resize', function() { drag = null; inspector.style.left = inspector.style.top = inspector.style.right = ''; } );
 		get('reset').onclick = function() {
-			dim.value = 512; pad.value = 2; shape.value = '0'; esc.checked = false;
+			dim.value = 512; pad.value = 2; shape.value = '0'; ver.value = ''; esc.checked = false;
 			opaque.checked = compact.checked = true;
 			contours.checked = false;
 			fg.value = '#202127'; bg.value = '#ffffff';
@@ -679,6 +685,18 @@
 			};
 		});
 		syncSheet();
+		var sizeGroup;
+		DATAMatrix.formats.forEach( function( format, i ) {
+			if( 0 === i || 24 === i || 30 === i ) {
+				sizeGroup = document.createElement( 'optgroup' );
+				sizeGroup.label = 0 === i ? 'Square' : 24 === i ? 'Rectangle' : 'DMRE';
+				ver.appendChild( sizeGroup );
+			}
+			var option = document.createElement( 'option' );
+			option.value = ( format[ 3 ] || format[ 2 ] ) + 'x' + format[ 2 ];
+			option.textContent = format[ 2 ] + ' × ' + ( format[ 3 ] || format[ 2 ] );
+			sizeGroup.appendChild( option );
+		});
 		fit();
 		update();
 	})();
