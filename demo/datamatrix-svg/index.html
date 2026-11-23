@@ -438,13 +438,13 @@
 				output = new XMLSerializer().serializeToString( svg );
 				if( contours.checked ) DataMatrixDemoContourPreview( svg );
 				box.replaceChildren( svg );
-                box.setAttribute('aria-label',matrix.width+' × '+matrix.height+' · Generated Data Matrix ECC 200');
+                box.setAttribute('aria-label',matrix.height+' × '+matrix.width+' · Generated Data Matrix ECC 200');
 				get('version').textContent = matrix.width === matrix.height ? 'Square' : info.dmre ? 'DMRE' : 'Rectangle';
 				patch( get('overview'), info.overview );
 				patch( get('metadata'), info.metadata );
 				patch( get('decoded'), info.decoded );
 				get('actual').textContent = info.actual;
-				get('matrix').textContent = matrix.width + ' × ' + matrix.height;
+				get('matrix').textContent = matrix.height + ' × ' + matrix.width;
 				get('size').textContent = ( new Blob( [output] ).size / 1024 ).toFixed( 2 ) + ' KB';
 				get('time').textContent = elapsed.toFixed( 1 ) + ' ms';
 				setStatus( '' );
@@ -492,7 +492,7 @@
             var note=document.createElement('p'); note.className='note';
             note.textContent='Bytes count decoded data. Codewords include mode and length headers and explicit unlatches; leading GS1, Macro and ECI headers and padding are excluded. UTF-8 characters may span segments; incomplete fragments are shown as hexadecimal bytes.';
             decodedView.append(note);
-            return {overview:overview,metadata:metadata,decoded:decodedView,dmre:info.dmre,actual:matrix.width+' × '+matrix.height+(info.dmre?' · DMRE':' · ECC 200')};
+            return {overview:overview,metadata:metadata,decoded:decodedView,dmre:info.dmre,actual:matrix.height+' × '+matrix.width+(info.dmre?' · DMRE':' · ECC 200')};
         },
 
 		setStatus = function( text ) {
@@ -693,8 +693,8 @@
 				ver.appendChild( sizeGroup );
 			}
 			var option = document.createElement( 'option' );
-			option.value = ( format[ 3 ] || format[ 2 ] ) + 'x' + format[ 2 ];
-			option.textContent = format[ 2 ] + ' × ' + ( format[ 3 ] || format[ 2 ] );
+			option.value = format[ 2 ] + 'x' + ( format[ 3 ] || format[ 2 ] );
+			option.textContent = option.value.replace( 'x', ' × ' );
 			sizeGroup.appendChild( option );
 		});
 		fit();
